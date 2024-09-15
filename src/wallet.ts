@@ -26,5 +26,10 @@ export class Wallet {
         const tx = new Transaction(this.publicKey, payeePublicKey, amount);
         tx.signTransaction(this.privateKey);
         this.chain.addTransaction(tx);
+        return tx;
+    }
+
+    verifyTransaction(transaction: Transaction) {
+        this.chain.verifyTransaction(transaction, this.publicKey);
     }
 }

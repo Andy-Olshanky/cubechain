@@ -23,11 +23,13 @@ export class CubeChain {
     }
 
     minePendingTransactions(miningRewardAddress: string) {
-        const txReward = new Transaction(null, miningRewardAddress, this.miningReward);
-        this.pendingTransactions.push(txReward);
+        const rewardTx = new Transaction(null, miningRewardAddress, this.miningReward);
 
-        let cube = new Cube(Date.now(), this.pendingTransactions, this.getLatestCube().hash);
+        let cube = new Cube(Date.now(), [...this.pendingTransactions, rewardTx], this.getLatestCube().hash, miningRewardAddress);
+
         cube.mineCube(this.difficulty);
+
+        console.log('Cube successfully mined!');
         this.chain.push(cube);
 
         this.pendingTransactions = [];
@@ -46,14 +48,24 @@ export class CubeChain {
             throw new Error('Transaction amount should be higher than 0');
         }
 
-        if (transaction.fromAddress !== null) {
-            const walletBalance = this.getBalanceOfAddress(transaction.fromAddress);
-            if (walletBalance < transaction.amount) {
-                throw new Error('Not enough balance');
-            }
+        const totalAmount = transaction.amount + transaction.verifierReward;
+        const balanceOfSender = this.getBalanceOfAddress(transaction.fromAddress);
+        if (balanceOfSender < totalAmount) {
+            throw new Error('Not enough balance in sender address');
         }
 
         this.pendingTransactions.push(transaction);
+    }
+
+    verifyTransaction(transaction: Transaction, verifierAddress: string) {
+        if (this.pendingTransactions.includes(transaction)) {
+            const verifierRewardTx = new Transaction(null, verifierAddress, transaction.verifierReward);
+            this.pendingTransactions.push(verifierRewardTx);
+
+            console.log(`Transaction verified by ${verifierAddress}`);
+        } else {
+            throw new Error('Transaction not found in pending transactions');
+        }
     }
 
     getBalanceOfAddress(address: string) {
@@ -63,6 +75,9 @@ export class CubeChain {
             for (const tx of cube.transactions) {
                 if (tx.fromAddress === address) {
                     balance -= tx.amount;
+                    if (tx.fromAddress !== null) { // Not a reward transaction
+                        balance -= tx.verifierReward;
+                    }
                 }
 
                 if (tx.toAddress === address) {

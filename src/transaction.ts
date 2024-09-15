@@ -6,6 +6,7 @@ export class Transaction {
     amount: number;
     timestamp: number;
     signature: string | null;
+    verifierReward: number;
 
     constructor(fromAddress: string | null, toAddress: string, amount: number) {
         this.fromAddress = fromAddress;
@@ -13,6 +14,7 @@ export class Transaction {
         this.amount = amount;
         this.timestamp = Date.now();
         this.signature = null;
+        this.verifierReward = 1;
     }
 
     calculateHash() {
@@ -20,7 +22,8 @@ export class Transaction {
             this.fromAddress +
             this.toAddress +
             this.amount +
-            this.timestamp
+            this.timestamp +
+            this.verifierReward
         ).digest('hex');
     }
 

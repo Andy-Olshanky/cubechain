@@ -7,16 +7,17 @@ export class Cube {
     transactions: Transaction[];
     hash: string;
     nonce: number;
+    miner: string;
 
     // nonce is the number of times hash has been calculated to ensure that the hash starts with the required number of zeros
     // used as proof of work
-    constructor(timestamp: number, transactions: Transaction[], previousHash = '') {
+    constructor(timestamp: number, transactions: Transaction[], previousHash = '', miner = '') {
         this.timestamp = timestamp;
         this.previousHash = previousHash;
         this.transactions = transactions;
         this.hash = this.calculateHash();
         this.nonce = 0;
-        
+        this.miner = miner;
     }
 
     calculateHash() {
@@ -24,7 +25,8 @@ export class Cube {
             this.previousHash +
             this.timestamp +
             JSON.stringify(this.transactions) +
-            this.nonce
+            this.nonce +
+            this.miner
         ).digest('hex');
     }
 
