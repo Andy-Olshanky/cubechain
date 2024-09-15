@@ -8,13 +8,13 @@ export class Transaction {
     signature: string | null;
     verifierReward: number;
 
-    constructor(fromAddress: string | null, toAddress: string, amount: number) {
+    constructor(fromAddress: string | null, toAddress: string, amount: number, verifierReward = 1) {
         this.fromAddress = fromAddress;
         this.toAddress = toAddress;
         this.amount = amount;
         this.timestamp = Date.now();
         this.signature = null;
-        this.verifierReward = 1;
+        this.verifierReward = verifierReward;
     }
 
     calculateHash() {
