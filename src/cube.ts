@@ -36,7 +36,7 @@ export class Cube {
             this.nonce++;
             this.hash = this.calculateHash();
         }
-        console.log('Cube mined: ' + this.hash);
+        // console.log('Cube mined: ' + this.hash);
     }
 
     hasValidTransactions() {
