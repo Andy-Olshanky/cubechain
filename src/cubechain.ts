@@ -67,7 +67,7 @@ export class CubeChain {
             const verifierRewardTx = new Transaction(null, verifierAddress, transaction.verifierReward);
             this.pendingTransactions.push(verifierRewardTx);
 
-            console.log(`Transaction verified by ${verifierAddress}`);
+            // console.log(`Transaction verified by ${verifierAddress}`);
         } else {
             throw new Error('Transaction not found in pending transactions');
         }
