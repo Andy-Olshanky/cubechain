@@ -22,8 +22,8 @@ export class CubeChain {
         return this.chain[this.chain.length - 1];
     }
 
-    minePendingTransactions(miningRewardAddress: string) {
-        const rewardTx = new Transaction(null, miningRewardAddress, this.miningReward);
+    minePendingTransactions(miningRewardAddress: string, miningRewardAmount: number | null = null) {
+        const rewardTx = new Transaction(null, miningRewardAddress, miningRewardAmount || this.miningReward);
 
         let cube = new Cube(Date.now(), [...this.pendingTransactions, rewardTx], this.getLatestCube().hash, miningRewardAddress);
 
