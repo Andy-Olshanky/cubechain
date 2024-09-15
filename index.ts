@@ -190,39 +190,69 @@ class CubeChain {
     } 
 }
 
+class Wallet {
+    publicKey: string;
+    privateKey: string;
+    chain: CubeChain;
+
+    constructor(chain: CubeChain) {
+        const keypair = crypto.generateKeyPairSync('rsa', {
+            modulusLength: 2048,
+            publicKeyEncoding: { type: 'spki', format: 'pem' },
+            privateKeyEncoding: { type: 'pkcs8', format: 'pem' }
+        });
+        this.publicKey = keypair.publicKey;
+        this.privateKey = keypair.privateKey;
+        this.chain = chain;
+    }
+
+    getBalance() {
+        return this.chain.getBalanceOfAddress(this.publicKey);
+    }
+
+    sendMoney(amount: number, payeePublicKey: string) {
+        const tx = new Transaction(this.publicKey, payeePublicKey, amount);
+        tx.signTransaction(this.privateKey);
+        this.chain.addTransaction(tx);
+    }
+}
+
 // Testing the Cubechain
 let coin = new CubeChain();
 
-const { privateKey, publicKey } = crypto.generateKeyPairSync('rsa', {
-    modulusLength: 2048,
-    publicKeyEncoding: { type: 'spki', format: 'pem' },
-    privateKeyEncoding: { type: 'pkcs8', format: 'pem' }
-});
+const wallet1 = new Wallet(coin);
+const wallet2 = new Wallet(coin);
 
-console.log('Mining initial cube...');
-coin.minePendingTransactions(publicKey);
+console.log('Mining initial block...');
+coin.minePendingTransactions(wallet1.publicKey);
 
-console.log('Mining second cube...');
-coin.minePendingTransactions(publicKey);
+console.log('Mining second block...');
+coin.minePendingTransactions(wallet1.publicKey);
 
-console.log('Balance of miner is', coin.getBalanceOfAddress(publicKey));
+console.log('Wallet1 balance: ' + wallet1.getBalance());
 
-const tx1 = new Transaction(publicKey, 'address2', 50);
-tx1.signTransaction(privateKey);
-coin.addTransaction(tx1);
+try {
+    console.log('Attempting to send 50 coins from wallet1 to wallet2...');
+    wallet1.sendMoney(50, wallet2.publicKey);
 
-console.log('Starting the miner...');
-coin.minePendingTransactions('minerAddress');
+    console.log('Mining pending transactions...');
+    coin.minePendingTransactions(wallet1.publicKey);
 
-console.log('Balance of sender is', coin.getBalanceOfAddress(publicKey));
-console.log('Balance of recipient is', coin.getBalanceOfAddress('address2'));
-console.log('Balance of miner is', coin.getBalanceOfAddress('minerAddress'));
+    console.log('Wallet1 balance: ' + wallet1.getBalance());
+    console.log('Wallet2 balance: ' + wallet2.getBalance());
+} catch (e) {
+    if (e instanceof Error) {
+        console.log('Transaction failed: ' + e.message);
+    } else {
+        console.log('Transaction failed: ' + e);
+    }
+}
 
-coin.minePendingTransactions('minerAddress');
+// Mine one more block to include the mining reward transaction
+coin.minePendingTransactions(wallet1.publicKey);
 
-console.log('Balance of sender is', coin.getBalanceOfAddress(publicKey));
-console.log('Balance of recipient is', coin.getBalanceOfAddress('address2'));
-console.log('Balance of miner is', coin.getBalanceOfAddress('minerAddress'));
+console.log('Final balance of wallet1 is', wallet1.getBalance());
+console.log('Final balance of wallet2 is', wallet2.getBalance());
 
 // console.log(JSON.stringify(coin, null, 1));
 // console.log('Is Cubechain valid? ' + coin.isChainValid());
