@@ -60,7 +60,10 @@ function getRandomAmount() {
     return Math.floor(Math.random() * (500 - 5 + 1) + 5);
 }
 
-for (let i = 0; i< 50; i++) {
+const numTransactions = 50;
+const start = performance.now();
+
+for (let i = 0; i < numTransactions; i++) {
     try {
         if (Math.random() < 0.2) { // 20% chance of mining a new cube
             
@@ -91,6 +94,9 @@ for (let i = 0; i< 50; i++) {
         }
     }
 }
+
+const end = performance.now();
+console.log(`\n${numTransactions} transactions took ${(end - start).toFixed(2)} milliseconds`);
 
 // Print final balances
 console.log('\nFinal Balances:');
