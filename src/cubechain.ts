@@ -22,14 +22,19 @@ export class CubeChain {
         return this.chain[this.chain.length - 1];
     }
 
-    minePendingTransactions(miningRewardAddress: string, miningRewardAmount: number | null = null) {
+    minePendingTransactions(miningRewardAddress: string, miningRewardAmount: number | null = null, mine: boolean = false) {
         const rewardTx = new Transaction(null, miningRewardAddress, miningRewardAmount || this.miningReward);
 
         let cube = new Cube(Date.now(), [...this.pendingTransactions, rewardTx], this.getLatestCube().hash, miningRewardAddress);
 
-        cube.mineCube(this.difficulty);
+        // Mining a new cube or verifying a transaction
+        if (mine) {
+            cube.mineCube(this.difficulty + 2);
+        } else {
+            cube.mineCube(this.difficulty);
+        }
 
-        console.log('Cube successfully mined!');
+        // console.log('Cube successfully mined!');
         this.chain.push(cube);
 
         this.pendingTransactions = [];
