@@ -57,9 +57,9 @@ export class CubeChain {
         const balanceOfSender = this.getBalanceOfAddress(transaction.fromAddress);
         if (balanceOfSender < totalAmount) {
             throw new Error('Not enough balance in sender address');
+        } else {
+            this.pendingTransactions.push(transaction);
         }
-
-        this.pendingTransactions.push(transaction);
     }
 
     verifyTransaction(transaction: Transaction, verifierAddress: string) {

@@ -56,8 +56,9 @@ function getRandomWallet(walletList: any[]) {
 }
 
 // Get a random amount 5-500
-function getRandomAmount() {
-    return Math.floor(Math.random() * (500 - 5 + 1) + 5);
+function getRandomAmount(sender: Wallet) {
+    const max = Math.min(500, sender.getBalance());
+    return Math.floor(Math.random() * (max - 5 + 1) + 5);
 }
 
 const numTransactions = 50;
@@ -78,7 +79,7 @@ for (let i = 0; i < numTransactions; i++) {
             while (recipient === sender) {
                 recipient = getRandomWallet(allWallets);
             }
-            const amount = getRandomAmount();
+            const amount = getRandomAmount(sender.wallet);
             const verifier = getRandomWallet(verifiers);
 
             console.log(`Sending money from Wallet ${sender.name} to Wallet ${recipient.name}, verified by Wallet ${verifier.name}`);
@@ -104,8 +105,8 @@ allWallets.forEach((wallet) => {
     console.log(`Wallet ${wallet.name} balance: ${wallet.wallet.getBalance()}`);
 });
 
-// // Verify the integrity of the blockchain
-// console.log(`\nIs blockchain valid? ${coin.isChainValid()}`);
+// Verify the integrity of the blockchain
+console.log(`\nIs blockchain valid? ${coin.isChainValid()}`);
 
 // // Print the entire blockchain
 // console.log('\nBlockchain:');
